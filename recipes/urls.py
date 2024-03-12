@@ -1,6 +1,7 @@
 from django.urls import path
 
 from recipes.views import site
+from recipes.views import api
 
 app_name = 'recipes'
 
@@ -44,5 +45,10 @@ urlpatterns = [
         'recipes/theory/',
         site.theory,
         name='theory',
+    ),
+    path(
+        'recipes/api/v2/',
+        api.recipe_api_list,
+        name='recipes_api_v2'   
     )
 ]
