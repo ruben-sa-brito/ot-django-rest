@@ -50,5 +50,11 @@ urlpatterns = [
         'recipes/api/v2/',
         api.recipe_api_list,
         name='recipes_api_v2'   
-    )
+    ),
+    path(
+        'recipes/api/v2/<int:pk>',
+        api.recipe_api_detail,
+        name='recipes_api_v2_detail'   
+    ),
+    
 ]
