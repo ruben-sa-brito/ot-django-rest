@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from ..models import Recipe
 from ..serializers import RecipesSerializer
 from ..serializers import TagSerializer
@@ -9,8 +10,20 @@ from django.shortcuts import get_object_or_404
 @api_view(http_method_names = ['get', 'post'])
 def recipe_api_list(request):
     if request.method == 'POST':
-        return Response('ok')
-    recipes = Recipe.objects.get_published()
+        serializer = RecipesSerializer(data=request.data)
+        if serializer.is_valid():
+            
+            return Response(
+                            serializer.validated_data,
+                            status=status.HTTP_201_CREATED
+            )
+        return Response(
+                        serializer.errors, 
+                        status=status.HTTP_400_BAD_REQUEST
+        )        
+    
+    
+    recipes = Recipe.objects.get_published()               
     serializer = RecipesSerializer(instance=recipes, context={'request':request}, many=True)
     return Response(serializer.data)
 
