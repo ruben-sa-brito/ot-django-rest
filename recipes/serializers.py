@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from tag.models import Tag
 from .models import Recipe
-from attr import attr
+from authors.validators import AuthorRecipeValidator
+from django.core.exceptions import ValidationError
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -13,7 +14,11 @@ class RecipesSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Recipe
-        fields = ['id','title','description','author','category','tags','public','preparation','servings','preparation_time','tag_links']
+        fields = ['id', 'title', 'description', 'author',
+            'category', 'tags', 'public', 'preparation', 'tag_links',
+            'preparation_time', 'preparation_time_unit', 'servings',
+            'servings_unit',
+            'preparation_steps', 'cover']
     
     public = serializers.BooleanField(source='is_published', read_only=True)
     preparation = serializers.SerializerMethodField(method_name="any_method_name", read_only=True)
@@ -33,25 +38,5 @@ class RecipesSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         super_validate = super().validate(attrs)
-
-        title = attrs['title']
-        description = attrs['description']
-
-        if title == description:
-            raise serializers.ValidationError(
-                {
-                    "title": ["titulo nao pode ser igual a descriçao"],
-                    "description": ["descriçao nao pode ser igual ao titulo"],
-                }
-            )
-
+        AuthorRecipeValidator(data=attrs, ErrorClass=ValidationError)
         return super_validate
-    
-    
-    def validate_title(self, value):
-        
-        if len(value) < 5:
-            raise serializers.ValidationError('Must have at least 5 chars.')
-        
-        return value
-            
